@@ -4,6 +4,8 @@ import java.security.Key;
 import java.util.Date;
 
 import com.sophia.sophia_pharmacy_service.entities.User;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +17,16 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtil {
 
-    private final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    @Value("${secret.key}")
+    private String secret;
+
+    private Key SECRET_KEY;
+
+    @PostConstruct
+    public void init() {
+        SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
+    }
+
     private static final long EXPIRATION = 3600000;
 
     public String generateToken(User user) {

@@ -27,9 +27,13 @@ public class User {
     @Size(min = 8, message = "A senha deve ter no mínimo 8 caracteres")
     private String password;
 
-    public User(String username,String password, String email) {
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
+
+    public User(String username,String password, String email, Provider provider) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.provider = provider;
     }
 }
