@@ -15,7 +15,7 @@ import java.util.Collections;
 public class GoogleAuth {
 
     @Value("${google.client.id}")
-    private static String CLIENT_ID;
+    private String CLIENT_ID;
 
     @Autowired
     private UserRepository userRepository;
