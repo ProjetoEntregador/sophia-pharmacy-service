@@ -26,45 +26,72 @@ public class JwtFilter extends OncePerRequestFilter {
     private UserRepository userRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        try{
-            String authHeader = request.getHeader("Authorization");
+        try {
+            String token = extractToken(request);
 
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                String token = authHeader.substring(7);
-
+            if (token != null) {
                 String email = jwtUtil.extractEmail(token);
 
-                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    User user = userRepository.findByEmail(email).orElse(null);
-
-                    if (user != null && jwtUtil.validateToken(token, new org.springframework.security.core.userdetails.User(
-                            user.getUsername(), user.getPassword(), new ArrayList<>()
-                    ))) {
-                        UsernamePasswordAuthenticationToken authToken =
-                                new UsernamePasswordAuthenticationToken(user.getUsername(), null, new ArrayList<>());
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
-                    }
+                if (isValidAuthentication(email)) {
+                    authenticateUser(token, email);
                 }
             }
 
             filterChain.doFilter(request, response);
 
         } catch (JwtException ex) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
+            handleUnauthorized(response);
+        }
+    }
 
-            String json = String.format(
-                    "{ \"timestamp\": \"%s\", \"status\": 401, \"error\": \"Unauthorized\", \"message\": \"%s\" }",
-                    java.time.LocalDateTime.now(), "Faça login para acessar este recurso"
-            );
 
-            response.getWriter().write(json);
+    private String extractToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
         }
 
+        return null;
+    }
+
+
+    private boolean isValidAuthentication(String email) {
+        return email != null && SecurityContextHolder.getContext().getAuthentication() == null;
+    }
+
+
+    private void authenticateUser(String token, String email) {
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if (user == null) return;
+
+        boolean isValid = jwtUtil.validateToken(token,
+                new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), new ArrayList<>()));
+
+        if (isValid) {
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(user.getUsername(), null, new ArrayList<>());
+
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        }
+    }
+
+
+    private void handleUnauthorized(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        String json = String.format(
+                "{ \"timestamp\": \"%s\", \"status\": 401, \"error\": \"Unauthorized\", \"message\": \"%s\" }",
+                java.time.LocalDateTime.now(),
+                "Faça login para acessar este recurso"
+        );
+
+        response.getWriter().write(json);
     }
 }
