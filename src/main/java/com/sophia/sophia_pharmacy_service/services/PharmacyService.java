@@ -33,13 +33,13 @@ public class PharmacyService {
     PharmacyMapper pharmacyMapper;
 
 
-    public void validatePermission(Long pharmacyId, String email) {
+    private void validatePermission(Long pharmacyId, String email) {
         Permission permission = permissionRepository
                 .findByUserEmailAndPharmacyId(email, pharmacyId)
                 .orElseThrow(() -> new RuntimeException("Usuário não possui acesso a essa farmácia"));
     }
 
-    public void validateRole(Long pharmacyId, String email) {
+    private void validateRole(Long pharmacyId, String email) {
         Permission permission = permissionRepository
                 .findByUserEmailAndPharmacyId(email, pharmacyId)
                 .orElseThrow(() -> new RuntimeException("Usuário não possui acesso a essa farmácia"));
@@ -50,11 +50,8 @@ public class PharmacyService {
 
     @Transactional
     public List<PharmacyListDto> findAll(String email){
-        List<Long> permissions = permissionRepository.findAllByUserEmail(email)
-                .stream().map(Permission::getPharmacy).toList()
-                .stream().map(Pharmacy::getId).toList();
-
-        List<Pharmacy> pharmacies = pharmacyRepository.findAllById(permissions);
+        List<Pharmacy> pharmacies = permissionRepository.findAllByUserEmail(email)
+                .stream().map(Permission::getPharmacy).toList();
 
         return pharmacyMapper.toDtoList(pharmacies);
     }
