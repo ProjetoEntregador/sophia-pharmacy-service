@@ -5,7 +5,7 @@ import com.sophia.sophia_pharmacy_service.auth.JwtUtil;
 import com.sophia.sophia_pharmacy_service.dtos.auth.LoginDto;
 import com.sophia.sophia_pharmacy_service.dtos.auth.UserDto;
 import com.sophia.sophia_pharmacy_service.dtos.mappers.UserMapper;
-import com.sophia.sophia_pharmacy_service.entities.Provider;
+import com.sophia.sophia_pharmacy_service.entities.enums.Provider;
 import com.sophia.sophia_pharmacy_service.entities.User;
 import com.sophia.sophia_pharmacy_service.repositories.UserRepository;
 import jakarta.transaction.Transactional;

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -47,16 +48,5 @@ public class UserController {
 
         return ResponseEntity.ok(Map.of("token", token));
     }
-
-    @Profile("dev")
-    @GetMapping("/test")
-    public ResponseEntity<ApiResponseDto<Void>> test(){
-        ApiResponseDto<Void> response = new ApiResponseDto<>();
-        response.setStatus("success");
-        response.setData(null);
-        response.setMessage("Rota protegida acessada com sucesso");
-        return ResponseEntity.ok(response);
-    }
-
 
 }

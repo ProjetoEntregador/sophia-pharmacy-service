@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.sophia.sophia_pharmacy_service.entities.enums.Provider;
+
 @Entity
 @Table(name="tb_users")
 @Data
