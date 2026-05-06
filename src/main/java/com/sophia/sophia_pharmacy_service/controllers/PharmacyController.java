@@ -24,9 +24,7 @@ public class PharmacyController {
 
 
     @GetMapping("/list")
-    public ResponseEntity<ApiResponseDto<List<PharmacyListDto>>> getPharmacies(@AuthenticationPrincipal UserDetails userDetails){
-
-        String email = userDetails.getUsername();
+    public ResponseEntity<ApiResponseDto<List<PharmacyListDto>>> getPharmacies(@AuthenticationPrincipal String email){
 
         List<PharmacyListDto> pharmacies = pharmacyService.findAll(email);
 
@@ -40,10 +38,8 @@ public class PharmacyController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<PharmacyDetailDto>> getPharmacyById(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<ApiResponseDto<PharmacyDetailDto>> getPharmacyById(@AuthenticationPrincipal String email,
                                                                                 @PathVariable Long id ){
-        String email = userDetails.getUsername();
-
         PharmacyDetailDto pharmacy = pharmacyService.findById(id, email);
 
         ApiResponseDto<PharmacyDetailDto> response = new ApiResponseDto<>();
@@ -56,10 +52,8 @@ public class PharmacyController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponseDto<PharmacyDetailDto>> createPharmacy(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<ApiResponseDto<PharmacyDetailDto>> createPharmacy(@AuthenticationPrincipal String email,
                                                                             @Valid @RequestBody PharmacyEntryDto dto){
-        String email = userDetails.getUsername();
-
         PharmacyDetailDto pharmacy = pharmacyService.create(dto, email);
 
         ApiResponseDto<PharmacyDetailDto> response = new ApiResponseDto<>();
@@ -71,10 +65,9 @@ public class PharmacyController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<PharmacyDetailDto>> updatePharmacy(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<ApiResponseDto<PharmacyDetailDto>> updatePharmacy(@AuthenticationPrincipal String email,
                                                                             @PathVariable Long id,
                                                                             @Valid @RequestBody PharmacyEntryDto dto){
-        String email = userDetails.getUsername();
 
         PharmacyDetailDto pharmacy = pharmacyService.update(id, email, dto);
 
@@ -87,9 +80,8 @@ public class PharmacyController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<Void>> deletePharmacy(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<ApiResponseDto<Void>> deletePharmacy(@AuthenticationPrincipal String email,
                                                                @PathVariable Long id){
-        String email = userDetails.getUsername();
 
         pharmacyService.delete(id, email);
 

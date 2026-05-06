@@ -33,18 +33,12 @@ public class PharmacyService {
     PharmacyMapper pharmacyMapper;
 
 
-    private void validatePermission(Long pharmacyId, String email) {
-        Permission permission = permissionRepository
-                .findByUserEmailAndPharmacyId(email, pharmacyId)
-                .orElseThrow(() -> new RuntimeException("Usuário não possui acesso a essa farmácia"));
-    }
-
-    private void validateRole(Long pharmacyId, String email) {
+    private Boolean validatePermission(Long pharmacyId, String email) {
         Permission permission = permissionRepository
                 .findByUserEmailAndPharmacyId(email, pharmacyId)
                 .orElseThrow(() -> new RuntimeException("Usuário não possui acesso a essa farmácia"));
 
-        if (permission.getRole() != Role.OWNER) throw new RuntimeException("Usuário não possui nível de acesso para este recurso");
+        return permission.getRole() == Role.OWNER;
     }
 
 
@@ -89,7 +83,7 @@ public class PharmacyService {
         Pharmacy pharmacy = pharmacyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Farmácia não encontrada"));
 
-        validateRole(pharmacy.getId(), email);
+        if (validatePermission(pharmacy.getId(), email)) throw new RuntimeException("Usuário não possui nível de acesso para este recurso");
 
         pharmacyMapper.updateFromDto(dto, pharmacy);
 
@@ -101,7 +95,11 @@ public class PharmacyService {
         Pharmacy pharmacy = pharmacyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Farmácia não encontrada"));
 
-        validateRole(pharmacy.getId(), email);
+        if (validatePermission(pharmacy.getId(), email)) throw new RuntimeException("Usuário não possui nível de acesso para este recurso");
+
+        List<Permission> permissions = permissionRepository.findAllByPharmacyId(id);
+
+        permissionRepository.deleteAll(permissions);
 
         pharmacyRepository.delete(pharmacy);
     }

@@ -9,7 +9,7 @@ public class PharmacyDetailDto {
     private Long id;
     private String name;
     private String phone;
-    private String adress;
+    private String address;
     private String city;
     private double latitude;
     private double longitude;

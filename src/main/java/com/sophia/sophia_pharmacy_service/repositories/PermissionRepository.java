@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
     Optional<Permission> findByUserEmailAndPharmacyId(String email, Long pharmacyId);
     List<Permission> findAllByUserEmail(String email);
+
+    List<Permission> findAllByPharmacyId(Long pharmacyId);
 }

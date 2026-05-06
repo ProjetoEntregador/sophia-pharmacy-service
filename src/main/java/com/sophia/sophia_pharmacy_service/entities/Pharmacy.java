@@ -22,7 +22,7 @@ public class Pharmacy {
     private String phone;
 
     @NotBlank(message = "É preciso informar um endereço")
-    private String adress;
+    private String address;
 
     private String city;
 
