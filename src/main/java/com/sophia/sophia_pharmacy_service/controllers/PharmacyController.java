@@ -4,13 +4,14 @@ import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyDetailDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyEntryDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyListDto;
 import com.sophia.sophia_pharmacy_service.dtos.response.ApiResponseDto;
+import com.sophia.sophia_pharmacy_service.entities.enums.Role;
 import com.sophia.sophia_pharmacy_service.services.PharmacyService;
+import com.sophia.sophia_pharmacy_service.validation.CheckPharmacyPermission;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,6 +65,7 @@ public class PharmacyController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @CheckPharmacyPermission(role = Role.OWNER)
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDto<PharmacyDetailDto>> updatePharmacy(@AuthenticationPrincipal String email,
                                                                             @PathVariable Long id,
@@ -79,6 +81,7 @@ public class PharmacyController {
         return ResponseEntity.ok(response);
     }
 
+    @CheckPharmacyPermission(role = Role.OWNER)
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponseDto<Void>> deletePharmacy(@AuthenticationPrincipal String email,
                                                                @PathVariable Long id){

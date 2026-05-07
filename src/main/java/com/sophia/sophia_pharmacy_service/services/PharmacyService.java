@@ -33,15 +33,6 @@ public class PharmacyService {
     PharmacyMapper pharmacyMapper;
 
 
-    private Boolean validatePermission(Long pharmacyId, String email) {
-        Permission permission = permissionRepository
-                .findByUserEmailAndPharmacyId(email, pharmacyId)
-                .orElseThrow(() -> new RuntimeException("Usuário não possui acesso a essa farmácia"));
-
-        return permission.getRole() == Role.OWNER;
-    }
-
-
     @Transactional
     public List<PharmacyListDto> findAll(String email){
         List<Pharmacy> pharmacies = permissionRepository.findAllByUserEmail(email)
@@ -55,7 +46,9 @@ public class PharmacyService {
         Pharmacy pharmacy = pharmacyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Farmácia não encontrada"));
 
-        validatePermission(pharmacy.getId(), email);
+        Permission permission = permissionRepository
+                .findByUserEmailAndPharmacyId(email, id)
+                .orElseThrow(() -> new RuntimeException("Usuário não possui acesso a essa farmácia"));
 
         return pharmacyMapper.toDtoDetail(pharmacy);
     }
@@ -83,8 +76,6 @@ public class PharmacyService {
         Pharmacy pharmacy = pharmacyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Farmácia não encontrada"));
 
-        if (validatePermission(pharmacy.getId(), email)) throw new RuntimeException("Usuário não possui nível de acesso para este recurso");
-
         pharmacyMapper.updateFromDto(dto, pharmacy);
 
         return pharmacyMapper.toDtoDetail(pharmacyRepository.save(pharmacy));
@@ -94,8 +85,6 @@ public class PharmacyService {
     public void delete(Long id, String email){
         Pharmacy pharmacy = pharmacyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Farmácia não encontrada"));
-
-        if (validatePermission(pharmacy.getId(), email)) throw new RuntimeException("Usuário não possui nível de acesso para este recurso");
 
         List<Permission> permissions = permissionRepository.findAllByPharmacyId(id);
 
