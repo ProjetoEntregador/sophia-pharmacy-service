@@ -16,39 +16,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponseDto<Void>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-        ApiResponseDto<Void> response = new ApiResponseDto<>();
-        response.setStatus("error");
-        response.setMessage("Campo único duplicado.");
-
+        ApiResponseDto<Void> response = new ApiResponseDto<>("error: DataIntegrityViolation", null, ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponseDto<Void>> handleRuntime(RuntimeException ex) {
-        ApiResponseDto<Void> response = new ApiResponseDto<>();
-        response.setStatus("error");
-        response.setMessage(ex.getMessage());
-
+        ApiResponseDto<Void> response = new ApiResponseDto<>("error: RunTime",null, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(InvalidJwtException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidJwt(InvalidJwtException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", Instant.now().toString());
-        body.put("status", HttpStatus.UNAUTHORIZED.value());
-        body.put("error", "Invalid Token");
-        body.put("message", ex.getMessage());
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    public ResponseEntity<ApiResponseDto<Void>> handleInvalidJwt(InvalidJwtException ex) {
+        ApiResponseDto<Void> response = new ApiResponseDto<>("error: InvalidJwt",null, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiResponseDto<Void>> handleAccessDenied(AccessDeniedException ex) {
-        ApiResponseDto<Void> response = new ApiResponseDto<>();
-        response.setStatus("error");
-        response.setMessage(ex.getMessage());
-
+        ApiResponseDto<Void> response = new ApiResponseDto<>("error: AccessDenied",null, ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 }
