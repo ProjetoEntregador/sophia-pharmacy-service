@@ -42,7 +42,8 @@ public class InvitationService {
 
         Pharmacy pharmacy = pharmacyRepository.findById(pharmacyId).orElseThrow();
 
-        boolean alreadyInvited = inviteRepository.existsByEmailAndPharmacyIdAndStatus(email, pharmacyId, InvitationStatus.PENDING);
+        boolean alreadyInvited = inviteRepository.existsByEmailAndPharmacyIdAndStatus(email, pharmacyId,
+                                                                                            InvitationStatus.PENDING);
 
         if (alreadyInvited) {
             throw new RuntimeException("Usuário já possui convite pendente");
@@ -50,13 +51,8 @@ public class InvitationService {
 
         String token = UUID.randomUUID().toString();
 
-        Invitation invite = new Invitation();
-        invite.setEmail(email);
-        invite.setToken(token);
-        invite.setStatus(InvitationStatus.PENDING);
-        invite.setExpiration(LocalDateTime.now().plusDays(3));
-        invite.setPharmacy(pharmacy);
-        invite.setInvitedBy(owner);
+        Invitation invite = new Invitation(email, token, InvitationStatus.PENDING,
+                                            LocalDateTime.now().plusDays(3), pharmacy, owner);
 
         inviteRepository.save(invite);
 
@@ -86,10 +82,7 @@ public class InvitationService {
             throw new RuntimeException("Este convite não pertence ao usuário");
         }
 
-        Permission permission = new Permission();
-        permission.setUser(user);
-        permission.setPharmacy(invitation.getPharmacy());
-        permission.setRole(Role.EMPLOYEE);
+        Permission permission = new Permission(user, invitation.getPharmacy(), Role.EMPLOYEE);
 
         permissionRepository.save(permission);
 

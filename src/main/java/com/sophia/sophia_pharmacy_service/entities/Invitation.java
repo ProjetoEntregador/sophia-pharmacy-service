@@ -31,4 +31,14 @@ public class Invitation {
 
     @ManyToOne
     private User invitedBy;
+
+    public Invitation(String email, String token, InvitationStatus status, LocalDateTime expiration, Pharmacy pharmacy, User invitedBy){
+        this.email = email;
+        this.token = token;
+        this.status = status;
+        this.expiration = expiration;
+        this. pharmacy = pharmacy;
+        this.invitedBy = invitedBy;
+
+    }
 }

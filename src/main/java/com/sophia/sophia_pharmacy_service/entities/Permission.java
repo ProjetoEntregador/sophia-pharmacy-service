@@ -26,5 +26,11 @@ public class Permission {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    public Permission(User user, Pharmacy pharmacy, Role role){
+        this.user = user;
+        this.pharmacy = pharmacy;
+        this.role = role;
+    }
+
 }
 

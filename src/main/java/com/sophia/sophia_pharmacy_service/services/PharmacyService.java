@@ -61,10 +61,9 @@ public class PharmacyService {
 
         Pharmacy newPharmacy = pharmacyMapper.toEntity(dto);
 
-        Permission  newPermission = new Permission();
-        newPermission.setPharmacy(pharmacyRepository.save(newPharmacy));
-        newPermission.setUser(owner);
-        newPermission.setRole(Role.OWNER);
+        pharmacyRepository.save(newPharmacy);
+
+        Permission  newPermission = new Permission(owner, newPharmacy, Role.OWNER);
 
         permissionRepository.save(newPermission);
 

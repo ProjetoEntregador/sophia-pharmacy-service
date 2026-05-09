@@ -28,25 +28,31 @@ public class UserController {
     public ResponseEntity<ApiResponseDto<Void>> register(@Valid @RequestBody UserDto dto) {
         userService.register(dto);
 
-        ApiResponseDto<Void> response = new ApiResponseDto<>();
-        response.setStatus("success");
-        response.setData(null);
-        response.setMessage("Usuário criado com sucesso");
+        ApiResponseDto<Void> response = new ApiResponseDto<>("success",
+                null, "Usuário criado com sucesso");
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String,String>> login(@Valid @RequestBody LoginDto dto) {
+    public ResponseEntity<ApiResponseDto<String>> login(@Valid @RequestBody LoginDto dto) {
         String token = userService.login(dto);
-        return ResponseEntity.ok(Collections.singletonMap("token", token));
+
+        ApiResponseDto<String> response = new ApiResponseDto<>("success",
+                token, "Login efetuado com sucessso");
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/google")
-    public ResponseEntity<?> loginGoogle(@RequestBody GoogleLoginDto dto) {
+    public ResponseEntity<ApiResponseDto<String>> loginGoogle(@RequestBody GoogleLoginDto dto) {
 
         String token = userService.loginWithGoogle(dto.getIdToken());
 
-        return ResponseEntity.ok(Map.of("token", token));
+        ApiResponseDto<String> response = new ApiResponseDto<>("success",
+                token, "Login Google efetuado com sucessso");
+
+        return ResponseEntity.ok(response);
     }
 
 }
