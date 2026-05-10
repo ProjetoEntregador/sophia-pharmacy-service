@@ -1,9 +1,12 @@
 package com.sophia.sophia_pharmacy_service.services;
 
+import com.sophia.sophia_pharmacy_service.dtos.localization.LocalizationDto;
+import com.sophia.sophia_pharmacy_service.dtos.localization.NearbyPharmaciesDto;
 import com.sophia.sophia_pharmacy_service.dtos.mappers.PharmacyMapper;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyDetailDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyEntryDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyListDto;
+import com.sophia.sophia_pharmacy_service.dtos.projections.NearbyPharmaciesProjection;
 import com.sophia.sophia_pharmacy_service.entities.Permission;
 import com.sophia.sophia_pharmacy_service.entities.Pharmacy;
 import com.sophia.sophia_pharmacy_service.entities.User;
@@ -15,6 +18,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -41,7 +45,7 @@ public class PharmacyService {
         return pharmacyMapper.toDtoList(pharmacies);
     }
 
-
+    @Transactional
     public PharmacyDetailDto findById(Long id, String email){
         Pharmacy pharmacy = pharmacyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Farmácia não encontrada"));
@@ -91,5 +95,23 @@ public class PharmacyService {
 
         pharmacyRepository.delete(pharmacy);
     }
+
+        @Transactional
+        public List<NearbyPharmaciesDto> findNearby(LocalizationDto dto){
+
+                 return pharmacyRepository.findNearbyPharmacies(dto.getLatitude(),dto.getLongitude(), dto.getRadiusKm())
+                         .stream().map(this::mapToDto).toList();
+        }
+
+        private NearbyPharmaciesDto mapToDto(NearbyPharmaciesProjection projection) {
+            return new NearbyPharmaciesDto(
+                    projection.getId(),
+                    projection.getName(),
+                    projection.getPhone(),
+                    projection.getAddress(),
+                    projection.getCity(),
+                    Math.round(projection.getDistanceKm() * 100.0) / 100.0
+            );
+        }
 
 }

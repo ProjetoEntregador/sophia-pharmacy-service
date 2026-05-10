@@ -1,5 +1,7 @@
 package com.sophia.sophia_pharmacy_service.controllers;
 
+import com.sophia.sophia_pharmacy_service.dtos.localization.LocalizationDto;
+import com.sophia.sophia_pharmacy_service.dtos.localization.NearbyPharmaciesDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyDetailDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyEntryDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyListDto;
@@ -80,12 +82,23 @@ public class PharmacyController {
 
         pharmacyService.delete(id, email);
 
-        ApiResponseDto<Void> response = new ApiResponseDto<>();
-        response.setStatus("success");
-        response.setMessage("Farmácia deletada com sucesso");
+        ApiResponseDto<Void> response = new ApiResponseDto<>("succes",
+                null, "Farmácia deletada com sucesso");
 
         return ResponseEntity.ok(response);
     }
 
+
+    @GetMapping("/nearby")
+    public ResponseEntity<ApiResponseDto<List<NearbyPharmaciesDto>>> findNearbyPharmacies(
+                                                                @Valid @ModelAttribute LocalizationDto dto){
+
+        List<NearbyPharmaciesDto> pharmacies = pharmacyService.findNearby(dto);
+
+        ApiResponseDto<List<NearbyPharmaciesDto>> response = new ApiResponseDto<>("succes",
+                pharmacies, "Requisição completada com sucesso");
+
+        return ResponseEntity.ok(response);
+    }
 
 }

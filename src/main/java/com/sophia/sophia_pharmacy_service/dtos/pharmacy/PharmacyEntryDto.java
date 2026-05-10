@@ -10,6 +10,6 @@ public class PharmacyEntryDto {
     private String phone;
     private String address;
     private String city;
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
 }
