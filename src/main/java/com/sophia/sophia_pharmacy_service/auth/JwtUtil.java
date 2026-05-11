@@ -4,6 +4,7 @@ import java.security.Key;
 import java.util.Date;
 
 import com.sophia.sophia_pharmacy_service.entities.User;
+import io.jsonwebtoken.io.Decoders;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,27 +21,26 @@ public class JwtUtil {
     @Value("${secret.key}")
     private String secret;
 
-    private Key SECRET_KEY;
+    private static final long EXPIRATION = 3600000;
 
-    @PostConstruct
-    public void init() {
-        SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
+    private Key getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    private static final long EXPIRATION = 3600000;
 
     public String generateToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(SECRET_KEY)
+                .signWith(getSigningKey())
                 .compact();
     }
 
     public String extractEmail(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
@@ -54,7 +54,7 @@ public class JwtUtil {
 
     private boolean isTokenExpired(String token) {
         Date expiration = Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
