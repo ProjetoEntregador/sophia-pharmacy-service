@@ -1,52 +1,45 @@
-version: '3.9'
-
 services:
-
   postgres:
     env_file:
       - .env
-
     image: postgres:16
     container_name: pharmacy-postgres
-
     environment:
       POSTGRES_DB: pharmacy_db
       POSTGRES_USER: ${DATASOURCE_USERNAME}
       POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
-
     ports:
-      - "5432:5432"
-
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - net1
 
   pharmacy-service:
     build: .
-
     env_file:
       - .env
-
     container_name: pharmacy-service
-
     depends_on:
       - postgres
-
     ports:
       - "8080:8080"
-
     environment:
       DATASOURCE_URL: ${DATASOURCE_URL}
       DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
       DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
-
       JWT_SECRET: ${JWT_SECRET}
-
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-
       MAIL_USERNAME: ${MAIL_SENDER_USERNAME}
       MAIL_PASSWORD: ${MAIL_APP_PASSWORD}
-
     restart: always
+    networks:
+      - net1
+
+networks:
+  net1:
+    external: true
+    name: net1
 
 volumes:
   postgres_data:
