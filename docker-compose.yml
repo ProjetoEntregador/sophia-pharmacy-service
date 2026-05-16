@@ -1,5 +1,5 @@
 services:
-  postgres:
+  pharmacy-postgres:
     env_file:
       - .env
     image: postgres:16
@@ -21,7 +21,7 @@ services:
       - .env
     container_name: pharmacy-service
     depends_on:
-      - postgres
+      - pharmacy-postgres
     ports:
       - "8080:8080"
     environment:
@@ -32,6 +32,7 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       MAIL_USERNAME: ${MAIL_SENDER_USERNAME}
       MAIL_PASSWORD: ${MAIL_APP_PASSWORD}
+      MEDICATION_URL: ${MEDICATION_URL}
     restart: always
     networks:
       - net1
