@@ -3,6 +3,7 @@ package com.sophia.sophia_pharmacy_service.services;
 import com.sophia.sophia_pharmacy_service.dtos.localization.LocalizationDto;
 import com.sophia.sophia_pharmacy_service.dtos.localization.NearbyPharmaciesDto;
 import com.sophia.sophia_pharmacy_service.dtos.mappers.PharmacyMapper;
+import com.sophia.sophia_pharmacy_service.dtos.medication.MedicationDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyDetailDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyEntryDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyListDto;
@@ -11,6 +12,7 @@ import com.sophia.sophia_pharmacy_service.entities.Permission;
 import com.sophia.sophia_pharmacy_service.entities.Pharmacy;
 import com.sophia.sophia_pharmacy_service.entities.User;
 import com.sophia.sophia_pharmacy_service.entities.enums.Role;
+import com.sophia.sophia_pharmacy_service.medication.MedicationClient;
 import com.sophia.sophia_pharmacy_service.repositories.PermissionRepository;
 import com.sophia.sophia_pharmacy_service.repositories.PharmacyRepository;
 import com.sophia.sophia_pharmacy_service.repositories.UserRepository;
@@ -18,11 +20,13 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class PharmacyService {
+
+    @Autowired
+    MedicationClient medicationClient;
 
     @Autowired
     PharmacyRepository pharmacyRepository;
@@ -35,7 +39,6 @@ public class PharmacyService {
 
     @Autowired
     PharmacyMapper pharmacyMapper;
-
 
     @Transactional
     public List<PharmacyListDto> findAll(String email){
@@ -96,22 +99,26 @@ public class PharmacyService {
         pharmacyRepository.delete(pharmacy);
     }
 
-        @Transactional
-        public List<NearbyPharmaciesDto> findNearby(LocalizationDto dto){
+    @Transactional
+    public List<NearbyPharmaciesDto> findNearby(LocalizationDto dto){
 
-                 return pharmacyRepository.findNearbyPharmacies(dto.getLatitude(),dto.getLongitude(), dto.getRadiusKm())
-                         .stream().map(this::mapToDto).toList();
-        }
+             return pharmacyRepository.findNearbyPharmacies(dto.getLatitude(),dto.getLongitude(), dto.getRadiusKm())
+                     .stream().map(this::mapToDto).toList();
+    }
 
-        private NearbyPharmaciesDto mapToDto(NearbyPharmaciesProjection projection) {
-            return new NearbyPharmaciesDto(
-                    projection.getId(),
-                    projection.getName(),
-                    projection.getPhone(),
-                    projection.getAddress(),
-                    projection.getCity(),
-                    Math.round(projection.getDistanceKm() * 100.0) / 100.0
-            );
-        }
+    private NearbyPharmaciesDto mapToDto(NearbyPharmaciesProjection projection) {
+
+        List<MedicationDto> medications = medicationClient.findByPharmacy(projection.getId());
+
+        return new NearbyPharmaciesDto(
+                projection.getId(),
+                projection.getName(),
+                projection.getPhone(),
+                projection.getAddress(),
+                projection.getCity(),
+                Math.round(projection.getDistanceKm() * 100.0) / 100.0,
+                medications
+        );
+    }
 
 }

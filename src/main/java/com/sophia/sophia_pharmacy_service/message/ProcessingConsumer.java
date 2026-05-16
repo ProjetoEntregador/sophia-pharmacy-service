@@ -7,39 +7,38 @@ import com.rabbitmq.client.Channel;
 import com.sophia.sophia_pharmacy_service.dtos.message.ProcessingRequest;
 import com.sophia.sophia_pharmacy_service.dtos.message.ProcessingResponse;
 
-import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
-@RequiredArgsConstructor
-public class ProcessingConsumer {
-  private final ProcessingPublisher publisher;
+    @Slf4j
+    @Component
+    public class ProcessingConsumer {
 
-  @RabbitListener(queues = "pharmacy.incoming.queue")
-  public void consume(ProcessingRequest request, Message message, Channel channel) throws IOException {
-    long deliveryTag = message.getMessageProperties().getDeliveryTag();
+      @Autowired
+      ProcessingPublisher publisher;
 
-    try {
-      System.out.println("Processing job: " + request.getJobId());
-      System.out.println("Processing job: " + request.getType());
+      @Autowired
+      PharmacyOrchestratorService orchestratorService;
 
-      // PROCESS
+      @RabbitListener(queues = "${rabbitmq.queue.incoming}")
+      public void consume(ProcessingRequest request, Message message, Channel channel) throws IOException {
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
 
-      ProcessingResponse response = new ProcessingResponse();
+        try {
+          log.info("Processing request {}", request.getJobId());
 
-      response.setJobId(request.getJobId());
-      response.setStatus("SUCCESS");
-      
-      publisher.publishResponse(response);
+          ProcessingResponse response = orchestratorService.process(request);
 
-      channel.basicAck(deliveryTag, false);
-    } catch (Exception e) {
-      System.out.println("Processing failed");
+          publisher.publishResponse(response);
 
-      channel.basicNack(deliveryTag, false, true);
-    }
-  }
+          channel.basicAck(deliveryTag, false);
+        } catch (Exception e) {
+          log.error("Processing failed", e);
+
+          channel.basicNack(deliveryTag, false, false);
+        }
+      }
 }

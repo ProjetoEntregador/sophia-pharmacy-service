@@ -2,16 +2,16 @@ package com.sophia.sophia_pharmacy_service.message;
 
 import com.sophia.sophia_pharmacy_service.dtos.message.ProcessingResponse;
 
-import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ProcessingPublisher {
-  private final RabbitTemplate rabbitTemplate;
+  @Autowired
+  RabbitTemplate rabbitTemplate;
 
   @Value("${rabbitmq.exchange}")
   private String exchange;
@@ -20,8 +20,9 @@ public class ProcessingPublisher {
   private String responseRouting;
 
   public void publishResponse(ProcessingResponse response) {
+
     rabbitTemplate.convertAndSend(exchange, responseRouting, response);
 
-    System.out.println("Response published");
+    log.info("Response Published");
   }
 }
