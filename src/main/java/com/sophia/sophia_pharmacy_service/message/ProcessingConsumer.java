@@ -2,8 +2,8 @@ package com.sophia.sophia_pharmacy_service.message;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
-
 import com.sophia.sophia_pharmacy_service.dtos.message.ProcessingRequest;
 import com.sophia.sophia_pharmacy_service.dtos.message.ProcessingResponse;
 
@@ -24,12 +24,14 @@ import org.springframework.stereotype.Component;
       PharmacyOrchestratorService orchestratorService;
 
       @RabbitListener(queues = "${rabbitmq.queue.incoming}")
-      public void consume(ProcessingRequest request, Message message, Channel channel) throws IOException {
+      public void consume(String body, Message message, Channel channel) throws IOException {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
 
-        try {
-          log.info("Processing request {}", request.getJobId());
+        ObjectMapper mapper = new ObjectMapper();
 
+        ProcessingRequest request = mapper.readValue(body, ProcessingRequest.class);
+
+        try {
           ProcessingResponse response = orchestratorService.process(request);
 
           publisher.publishResponse(response);
@@ -38,7 +40,7 @@ import org.springframework.stereotype.Component;
         } catch (Exception e) {
           log.error("Processing failed", e);
 
-          channel.basicNack(deliveryTag, false, false);
+          channel.basicNack(deliveryTag, false, true);
         }
       }
 }

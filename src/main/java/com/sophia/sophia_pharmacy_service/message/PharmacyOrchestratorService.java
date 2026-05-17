@@ -22,6 +22,6 @@ public class PharmacyOrchestratorService {
 
         List<NearbyPharmaciesDto> pharmacies = pharmacyService.findNearby(localization);
 
-        return new ProcessingResponse(request.getJobId(),"SUCCESS", pharmacies);
+        return new ProcessingResponse(request.getJid(), pharmacies);
     }
 }

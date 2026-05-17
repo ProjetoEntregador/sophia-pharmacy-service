@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProcessingRequest {
 
-    private String jobId;
+    private String jid;
     private Double latitude;
     private Double longitude;
     private Double radiusKm;

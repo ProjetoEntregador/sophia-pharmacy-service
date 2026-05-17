@@ -11,7 +11,7 @@ services:
     ports:
       - "5435:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pharmacy_postgres_data:/var/lib/postgresql/data
     networks:
       - net1
 
@@ -43,4 +43,4 @@ networks:
     name: net1
 
 volumes:
-  postgres_data:
+  pharmacy_postgres_data:

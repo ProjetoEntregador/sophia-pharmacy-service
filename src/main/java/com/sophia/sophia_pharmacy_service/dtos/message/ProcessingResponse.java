@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 public class ProcessingResponse {
 
-    private String jobId;
-    private String status;
+    private String jid;
     private List<NearbyPharmaciesDto> pharmacies;
 }
