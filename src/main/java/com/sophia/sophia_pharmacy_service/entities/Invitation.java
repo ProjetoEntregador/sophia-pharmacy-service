@@ -27,9 +27,11 @@ public class Invitation {
     private LocalDateTime expiration;
 
     @ManyToOne
+    @JoinColumn(name = "pharmacy_id", nullable = false)
     private Pharmacy pharmacy;
 
     @ManyToOne
+    @JoinColumn(name = "invited_by", nullable = false)
     private User invitedBy;
 
     public Invitation(String email, String token, InvitationStatus status, LocalDateTime expiration, Pharmacy pharmacy, User invitedBy){
