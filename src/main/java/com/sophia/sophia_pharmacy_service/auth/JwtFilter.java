@@ -69,8 +69,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (user == null) return;
 
-        boolean isValid = jwtUtil.validateToken(token,
-                new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), new ArrayList<>()));
+        boolean isValid = jwtUtil.validateToken(token, email);
 
         if (isValid) {
             UsernamePasswordAuthenticationToken authToken =
