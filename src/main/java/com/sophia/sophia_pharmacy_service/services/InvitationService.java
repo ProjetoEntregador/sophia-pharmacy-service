@@ -48,11 +48,16 @@ public class InvitationService {
 
         Pharmacy pharmacy = pharmacyRepository.findById(pharmacyId).orElseThrow();
 
-        boolean alreadyInvited = inviteRepository.existsByEmailAndPharmacyIdAndStatus(email, pharmacyId,
-                                                                                            InvitationStatus.PENDING);
+        boolean alreadyInvited = inviteRepository.existsByEmailAndPharmacyIdAndStatusIn(
+                                    email,
+                                    pharmacyId,
+                                    List.of(
+                                            InvitationStatus.PENDING,
+                                            InvitationStatus.ACCEPTED
+                                    ));
 
         if (alreadyInvited) {
-            throw new RuntimeException("Usuário já possui convite pendente");
+            throw new RuntimeException("Usuário já possui convite pendente ou aceito");
         }
 
         String token = UUID.randomUUID().toString();
