@@ -25,4 +25,7 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
     Page<Pharmacy> findPharmaciesByUserEmail(String email, Pageable pageable);
 
     List<Permission> findAllByPharmacyId(Long pharmacyId);
+
+    Page<Permission> findAllByPharmacyId(Long pharmacyId, Pageable pageable);
+
 }
