@@ -23,13 +23,13 @@ public class InvitationController {
 
     @PostMapping("/pharmacy/{id}/send")
     @CheckPharmacyPermission(role = Role.OWNER)
-    public ResponseEntity<ApiResponseDto<Void>> invite(@PathVariable Long id, @RequestBody InviteDto dto,
+    public ResponseEntity<ApiResponseDto<InviteListDto>> invite(@PathVariable Long id, @RequestBody InviteDto dto,
                                         @AuthenticationPrincipal String ownerEmail) {
 
-        inviteService.invite(id, dto.getEmail(), ownerEmail);
+        InviteListDto invite = inviteService.invite(id, dto.getEmail(), ownerEmail);
 
-        ApiResponseDto<Void> response = new ApiResponseDto<>("success",
-                null, "Email enviado com sucesso");
+        ApiResponseDto<InviteListDto> response = new ApiResponseDto<>("success",
+                invite, "Email enviado com sucesso");
 
         return ResponseEntity.ok(response);
     }

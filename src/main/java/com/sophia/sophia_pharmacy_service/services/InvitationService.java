@@ -42,7 +42,7 @@ public class InvitationService {
     private InvitationMapper invitationMapper;
 
     @Transactional
-    public void invite(Long pharmacyId, String email, String ownerEmail) {
+    public InviteListDto invite(Long pharmacyId, String email, String ownerEmail) {
 
         User owner = userRepository.findByEmail(ownerEmail).orElseThrow();
 
@@ -65,11 +65,10 @@ public class InvitationService {
         Invitation invite = new Invitation(email, token, InvitationStatus.PENDING,
                                             LocalDateTime.now().plusDays(3), pharmacy, owner);
 
-        inviteRepository.save(invite);
-
         String link = "LINK DO FRONT + token:" + token;
 
         emailService.sendInviteEmail(email, link, pharmacy.getName());
+        return invitationMapper.toDto(inviteRepository.save(invite));
     }
 
 
