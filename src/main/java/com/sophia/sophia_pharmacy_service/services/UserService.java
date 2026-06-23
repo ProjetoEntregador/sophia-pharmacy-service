@@ -7,7 +7,7 @@ import com.sophia.sophia_pharmacy_service.dtos.auth.UserDto;
 import com.sophia.sophia_pharmacy_service.dtos.auth.UserInfoDto;
 import com.sophia.sophia_pharmacy_service.dtos.mappers.PermissionMapper;
 import com.sophia.sophia_pharmacy_service.dtos.mappers.UserMapper;
-import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionDto;
+import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionUserDto;
 import com.sophia.sophia_pharmacy_service.entities.Permission;
 import com.sophia.sophia_pharmacy_service.entities.enums.Provider;
 import com.sophia.sophia_pharmacy_service.entities.User;
@@ -85,7 +85,7 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        List<PermissionDto> permissions = permissionMapper.toDtoList(permissionRepository.findAllByUserEmail(email));
+        List<PermissionUserDto> permissions = permissionMapper.toUserInfoDtoList(permissionRepository.findAllByUserEmail(email));
 
         return new UserInfoDto(user.getUsername(), email, permissions);
     }

@@ -1,6 +1,7 @@
 package com.sophia.sophia_pharmacy_service.dtos.mappers;
 
-import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionDto;
+import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionListDto;
+import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionUserDto;
 import com.sophia.sophia_pharmacy_service.entities.Permission;
 import com.sophia.sophia_pharmacy_service.entities.Pharmacy;
 import org.mapstruct.Mapper;
@@ -12,7 +13,12 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PermissionMapper {
     @Mapping(target = "pharmacy", source = "pharmacy.name")
-    PermissionDto toDto(Permission permission);
+    PermissionUserDto toUserInfoDto(Permission permission);
 
-    List<PermissionDto> toDtoList(List<Permission> permissionList);
+    List<PermissionUserDto> toUserInfoDtoList(List<Permission> permissionList);
+
+    @Mapping(target = "username", source = "user.username")
+    PermissionListDto ToDto(Permission permission);
+
+    List<PermissionListDto> ToDtoList(List<Permission> permissionList);
 }

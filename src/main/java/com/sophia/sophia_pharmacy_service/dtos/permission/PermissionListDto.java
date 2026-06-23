@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PermissionDto {
+public class PermissionListDto {
     private Long id;
-    private String pharmacy;
+    private String username;
     private Role role;
 }
