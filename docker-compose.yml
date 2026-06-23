@@ -33,6 +33,7 @@ services:
       MAIL_USERNAME: ${MAIL_SENDER_USERNAME}
       MAIL_PASSWORD: ${MAIL_APP_PASSWORD}
       MEDICATION_URL: ${MEDICATION_URL}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
     restart: always
     networks:
       - net1
