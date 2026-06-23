@@ -101,6 +101,7 @@ public class InvitationService {
         return invitationMapper.toDtoList(inviteRepository.findAllByPharmacyId(id));
     }
 
+    @Transactional
     public void cancel(Long id){
         Invitation invite = inviteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Convite não encontrad0"));
