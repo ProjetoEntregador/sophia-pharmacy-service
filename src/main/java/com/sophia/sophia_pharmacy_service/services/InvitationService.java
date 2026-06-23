@@ -42,17 +42,22 @@ public class InvitationService {
     private InvitationMapper invitationMapper;
 
     @Transactional
-    public void invite(Long pharmacyId, String email, String ownerEmail) {
+    public InviteListDto invite(Long pharmacyId, String email, String ownerEmail) {
 
         User owner = userRepository.findByEmail(ownerEmail).orElseThrow();
 
         Pharmacy pharmacy = pharmacyRepository.findById(pharmacyId).orElseThrow();
 
-        boolean alreadyInvited = inviteRepository.existsByEmailAndPharmacyIdAndStatus(email, pharmacyId,
-                                                                                            InvitationStatus.PENDING);
+        boolean alreadyInvited = inviteRepository.existsByEmailAndPharmacyIdAndStatusIn(
+                                    email,
+                                    pharmacyId,
+                                    List.of(
+                                            InvitationStatus.PENDING,
+                                            InvitationStatus.ACCEPTED
+                                    ));
 
         if (alreadyInvited) {
-            throw new RuntimeException("Usuário já possui convite pendente");
+            throw new RuntimeException("Usuário já possui convite pendente ou aceito");
         }
 
         String token = UUID.randomUUID().toString();
@@ -60,11 +65,10 @@ public class InvitationService {
         Invitation invite = new Invitation(email, token, InvitationStatus.PENDING,
                                             LocalDateTime.now().plusDays(3), pharmacy, owner);
 
-        inviteRepository.save(invite);
-
         String link = "LINK DO FRONT + token:" + token;
 
         emailService.sendInviteEmail(email, link, pharmacy.getName());
+        return invitationMapper.toDto(inviteRepository.save(invite));
     }
 
 
@@ -101,6 +105,7 @@ public class InvitationService {
         return invitationMapper.toDtoList(inviteRepository.findAllByPharmacyId(id));
     }
 
+    @Transactional
     public void cancel(Long id){
         Invitation invite = inviteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Convite não encontrad0"));
