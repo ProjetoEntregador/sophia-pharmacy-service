@@ -133,6 +133,15 @@ public class InvitationService {
         Invitation invite = inviteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Convite não encontrad0"));
 
+        if (invite.getStatus() == InvitationStatus.ACCEPTED){
+            Permission permission = permissionRepository.findByUserEmailAndPharmacyId(
+                    invite.getEmail(),
+                    invite.getPharmacy().getId()
+            ).orElseThrow(() -> new RuntimeException("Permissão não encontrada"));
+
+            permissionRepository.delete(permission);
+        }
+
         inviteRepository.delete(invite);
     }
 
