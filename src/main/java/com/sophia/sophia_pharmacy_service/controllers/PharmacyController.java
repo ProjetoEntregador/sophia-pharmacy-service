@@ -2,6 +2,7 @@ package com.sophia.sophia_pharmacy_service.controllers;
 
 import com.sophia.sophia_pharmacy_service.dtos.localization.LocalizationDto;
 import com.sophia.sophia_pharmacy_service.dtos.localization.NearbyPharmaciesDto;
+import com.sophia.sophia_pharmacy_service.dtos.pagination.PageResponse;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyDetailDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyEntryDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyListDto;
@@ -27,11 +28,13 @@ public class PharmacyController {
 
 
     @GetMapping("/list")
-    public ResponseEntity<ApiResponseDto<List<PharmacyListDto>>> getPharmacies(@AuthenticationPrincipal String email){
+    public ResponseEntity<ApiResponseDto<PageResponse<PharmacyListDto>>> getPharmacies(@AuthenticationPrincipal String email,
+                                                                   @RequestParam(defaultValue = "0") Integer offset,
+                                                                   @RequestParam(defaultValue = "10") Integer size){
 
-        List<PharmacyListDto> pharmacies = pharmacyService.findAll(email);
+        PageResponse<PharmacyListDto> pharmacies = pharmacyService.findAll(email, offset, size);
 
-        ApiResponseDto<List<PharmacyListDto>> response = new ApiResponseDto<>("success",
+        ApiResponseDto<PageResponse<PharmacyListDto>> response = new ApiResponseDto<>("success",
                 pharmacies, "Requisição completada com sucesso");
 
         return ResponseEntity.ok(response);

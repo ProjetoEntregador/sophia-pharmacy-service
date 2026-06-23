@@ -3,6 +3,7 @@ package com.sophia.sophia_pharmacy_service.controllers;
 import com.sophia.sophia_pharmacy_service.dtos.invitation.InviteAcceptDto;
 import com.sophia.sophia_pharmacy_service.dtos.invitation.InviteDto;
 import com.sophia.sophia_pharmacy_service.dtos.invitation.InviteListDto;
+import com.sophia.sophia_pharmacy_service.dtos.pagination.PageResponse;
 import com.sophia.sophia_pharmacy_service.dtos.response.ApiResponseDto;
 import com.sophia.sophia_pharmacy_service.entities.enums.Role;
 import com.sophia.sophia_pharmacy_service.services.InvitationService;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/invites")
@@ -49,10 +49,13 @@ public class InvitationController {
 
     @GetMapping("pharmacy/{id}/list")
     @CheckPharmacyPermission(role = Role.OWNER)
-    public ResponseEntity<ApiResponseDto<List<InviteListDto>>> getInvites(@PathVariable Long id){
-        List<InviteListDto> invites = inviteService.list(id);
+    public ResponseEntity<ApiResponseDto<PageResponse<InviteListDto>>> getInvites(@PathVariable Long id,
+                                                            @RequestParam(defaultValue = "0") Integer offset,
+                                                            @RequestParam(defaultValue = "10") Integer size){
 
-        ApiResponseDto<List<InviteListDto>> response = new ApiResponseDto<>("success",
+        PageResponse<InviteListDto> invites = inviteService.list(id, offset, size);
+
+        ApiResponseDto<PageResponse<InviteListDto>> response = new ApiResponseDto<>("success",
                 invites, "Requisição completda com sucesso");
 
         return ResponseEntity.ok(response);
