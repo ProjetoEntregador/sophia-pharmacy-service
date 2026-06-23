@@ -2,6 +2,7 @@ package com.sophia.sophia_pharmacy_service.controllers;
 
 import com.sophia.sophia_pharmacy_service.dtos.invitation.InviteAcceptDto;
 import com.sophia.sophia_pharmacy_service.dtos.invitation.InviteDto;
+import com.sophia.sophia_pharmacy_service.dtos.invitation.InviteListDto;
 import com.sophia.sophia_pharmacy_service.dtos.response.ApiResponseDto;
 import com.sophia.sophia_pharmacy_service.entities.enums.Role;
 import com.sophia.sophia_pharmacy_service.services.InvitationService;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/invites")
@@ -43,4 +46,27 @@ public class InvitationController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("pharmacy/{id}/list")
+    @CheckPharmacyPermission(role = Role.OWNER)
+    public ResponseEntity<ApiResponseDto<List<InviteListDto>>> getInvites(@PathVariable Long id){
+        List<InviteListDto> invites = inviteService.list(id);
+
+        ApiResponseDto<List<InviteListDto>> response = new ApiResponseDto<>("success",
+                invites, "Requisição completda com sucesso");
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("pharmacy/{id}/cancel/{inviteId}")
+    @CheckPharmacyPermission(role = Role.OWNER)
+    public ResponseEntity<ApiResponseDto<Void>> deleteInvite(@PathVariable Long id, @PathVariable Long inviteId ){
+        inviteService.cancel(inviteId);
+
+        ApiResponseDto<Void> response = new ApiResponseDto<>("success",
+                null, "Convite cancelado com sucesso");
+
+        return ResponseEntity.ok(response);
+    }
+
 }

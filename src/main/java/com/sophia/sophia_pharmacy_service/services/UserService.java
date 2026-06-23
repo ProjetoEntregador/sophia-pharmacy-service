@@ -4,13 +4,20 @@ import com.sophia.sophia_pharmacy_service.auth.GoogleAuth;
 import com.sophia.sophia_pharmacy_service.auth.JwtUtil;
 import com.sophia.sophia_pharmacy_service.dtos.auth.LoginDto;
 import com.sophia.sophia_pharmacy_service.dtos.auth.UserDto;
+import com.sophia.sophia_pharmacy_service.dtos.auth.UserInfoDto;
+import com.sophia.sophia_pharmacy_service.dtos.mappers.PermissionMapper;
 import com.sophia.sophia_pharmacy_service.dtos.mappers.UserMapper;
+import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionUserDto;
+import com.sophia.sophia_pharmacy_service.entities.Permission;
 import com.sophia.sophia_pharmacy_service.entities.enums.Provider;
 import com.sophia.sophia_pharmacy_service.entities.User;
+import com.sophia.sophia_pharmacy_service.repositories.PermissionRepository;
 import com.sophia.sophia_pharmacy_service.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -25,6 +32,12 @@ public class UserService {
 
     @Autowired
     private GoogleAuth googleAuth;
+
+    @Autowired
+    private PermissionRepository permissionRepository;
+
+    @Autowired
+    private PermissionMapper permissionMapper;
 
     @Transactional
     public void register(UserDto dto) {
@@ -67,4 +80,14 @@ public class UserService {
 
         return JwtUtil.generateToken(user);
     }
+
+    public UserInfoDto userInfo(String email){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        List<PermissionUserDto> permissions = permissionMapper.toUserInfoDtoList(permissionRepository.findAllByUserEmail(email));
+
+        return new UserInfoDto(user.getUsername(), email, permissions);
+    }
+
 }

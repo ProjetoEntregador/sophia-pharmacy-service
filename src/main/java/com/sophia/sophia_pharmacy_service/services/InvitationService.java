@@ -1,5 +1,7 @@
 package com.sophia.sophia_pharmacy_service.services;
 
+import com.sophia.sophia_pharmacy_service.dtos.invitation.InviteListDto;
+import com.sophia.sophia_pharmacy_service.dtos.mappers.InvitationMapper;
 import com.sophia.sophia_pharmacy_service.emailSender.EmailSender;
 import com.sophia.sophia_pharmacy_service.entities.Invitation;
 import com.sophia.sophia_pharmacy_service.entities.Permission;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -34,6 +37,9 @@ public class InvitationService {
 
     @Autowired
     private PermissionRepository permissionRepository;
+
+    @Autowired
+    private InvitationMapper invitationMapper;
 
     @Transactional
     public void invite(Long pharmacyId, String email, String ownerEmail) {
@@ -90,4 +96,16 @@ public class InvitationService {
 
         inviteRepository.save(invitation);
     }
+
+    public List<InviteListDto> list(Long id){
+        return invitationMapper.toDtoList(inviteRepository.findAllByPharmacyId(id));
+    }
+
+    public void cancel(Long id){
+        Invitation invite = inviteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Convite não encontrad0"));
+
+        inviteRepository.delete(invite);
+    }
+
 }
