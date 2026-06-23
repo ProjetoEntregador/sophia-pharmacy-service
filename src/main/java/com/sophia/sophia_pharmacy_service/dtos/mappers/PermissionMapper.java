@@ -18,6 +18,7 @@ public interface PermissionMapper {
     List<PermissionUserDto> toUserInfoDtoList(List<Permission> permissionList);
 
     @Mapping(target = "username", source = "user.username")
+    @Mapping(target = "email", source = "user.email")
     PermissionListDto ToDto(Permission permission);
 
     List<PermissionListDto> ToDtoList(List<Permission> permissionList);

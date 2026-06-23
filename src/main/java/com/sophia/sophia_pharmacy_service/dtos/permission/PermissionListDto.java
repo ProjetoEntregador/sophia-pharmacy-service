@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 public class PermissionListDto {
     private Long id;
     private String username;
+    private String email;
     private Role role;
 }
