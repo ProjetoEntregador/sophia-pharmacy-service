@@ -4,6 +4,7 @@ import com.sophia.sophia_pharmacy_service.dtos.localization.LocalizationDto;
 import com.sophia.sophia_pharmacy_service.dtos.localization.NearbyPharmaciesDto;
 import com.sophia.sophia_pharmacy_service.dtos.mappers.PharmacyMapper;
 import com.sophia.sophia_pharmacy_service.dtos.medication.MedicationDto;
+import com.sophia.sophia_pharmacy_service.dtos.pagination.PageResponse;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyDetailDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyEntryDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyListDto;
@@ -18,6 +19,9 @@ import com.sophia.sophia_pharmacy_service.repositories.PharmacyRepository;
 import com.sophia.sophia_pharmacy_service.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,11 +45,25 @@ public class PharmacyService {
     PharmacyMapper pharmacyMapper;
 
     @Transactional
-    public List<PharmacyListDto> findAll(String email){
-        List<Pharmacy> pharmacies = permissionRepository.findAllByUserEmail(email)
-                .stream().map(Permission::getPharmacy).toList();
+    public PageResponse<PharmacyListDto> findAll(String email, Integer offset, Integer size){
+        if (size <= 0 || offset < 0) {
+            throw new IllegalArgumentException("Parâmetros inválidos");
+        }
 
-        return pharmacyMapper.toDtoList(pharmacies);
+        int pageNumber = offset / size;
+
+        Pageable pageable = PageRequest.of(pageNumber, size);
+
+
+        Page<Pharmacy> page = permissionRepository.findPharmaciesByUserEmail(email, pageable);
+
+        return new PageResponse<>(
+                pharmacyMapper.toDtoList(page.getContent()),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.getSize(),
+                page.getNumber()
+        );
     }
 
     @Transactional
