@@ -3,6 +3,8 @@ package com.sophia.sophia_pharmacy_service.controllers;
 import com.sophia.sophia_pharmacy_service.dtos.auth.GoogleLoginDto;
 import com.sophia.sophia_pharmacy_service.dtos.auth.LoginDto;
 import com.sophia.sophia_pharmacy_service.dtos.auth.UserDto;
+import com.sophia.sophia_pharmacy_service.dtos.auth.UserInfoDto;
+import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyListDto;
 import com.sophia.sophia_pharmacy_service.dtos.response.ApiResponseDto;
 import com.sophia.sophia_pharmacy_service.services.UserService;
 import jakarta.validation.Valid;
@@ -14,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -51,6 +54,16 @@ public class UserController {
 
         ApiResponseDto<String> response = new ApiResponseDto<>("success",
                 token, "Login Google efetuado com sucessso");
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<ApiResponseDto<UserInfoDto>> getUserInfo(@AuthenticationPrincipal String email){
+        UserInfoDto userInfo = userService.userInfo(email);
+
+        ApiResponseDto<UserInfoDto> response = new ApiResponseDto<>("success",
+               userInfo , "Requisição completada com sucesso");
 
         return ResponseEntity.ok(response);
     }
