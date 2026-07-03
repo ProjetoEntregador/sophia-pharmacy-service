@@ -2,6 +2,7 @@ package com.sophia.sophia_pharmacy_service.services;
 
 import com.sophia.sophia_pharmacy_service.dtos.mappers.PermissionMapper;
 import com.sophia.sophia_pharmacy_service.dtos.pagination.PageResponse;
+import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionCheckDto;
 import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionListDto;
 import com.sophia.sophia_pharmacy_service.entities.Permission;
 import com.sophia.sophia_pharmacy_service.entities.enums.Role;
@@ -56,5 +57,13 @@ public class PermissionService {
 
         permissionRepository.delete(permission);
 
+    }
+
+    @Transactional
+    public PermissionCheckDto check(Long id, String email){
+        Permission permission = permissionRepository.findByUserEmailAndPharmacyId(email, id)
+                .orElseThrow(() -> new RuntimeException("Permissão não encontrada"));
+
+        return permissionMapper.toCheckDto(permission);
     }
 }
