@@ -43,4 +43,14 @@ public class PermissionController {
     }
 
 
+    @GetMapping("/check")
+    @CheckPharmacyPermission(role = {Role.EMPLOYEE, Role.OWNER})
+    public ResponseEntity<ApiResponseDto<PageResponse<PermissionListDto>>> checkPermission(@PathVariable Long id){
+
+        ApiResponseDto<PageResponse<PermissionListDto>> response = new ApiResponseDto<>("success",
+                null, "Permissão verificada");
+
+        return ResponseEntity.ok(response);
+    }
+
 }
