@@ -42,6 +42,7 @@ public class PharmacyController {
 
 
     @GetMapping("/{id}")
+    @CheckPharmacyPermission(role = {Role.EMPLOYEE, Role.OWNER})
     public ResponseEntity<ApiResponseDto<PharmacyDetailDto>> getPharmacyById(@AuthenticationPrincipal String email,
                                                                                 @PathVariable Long id ){
         PharmacyDetailDto pharmacy = pharmacyService.findById(id, email);

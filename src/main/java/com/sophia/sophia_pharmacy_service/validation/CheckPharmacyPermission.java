@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface CheckPharmacyPermission {
 
-    Role role();
+    Role[] role();
 
     String pharmacyIdParam() default "id";
 }

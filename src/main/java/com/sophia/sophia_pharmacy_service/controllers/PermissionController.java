@@ -1,6 +1,7 @@
 package com.sophia.sophia_pharmacy_service.controllers;
 
 import com.sophia.sophia_pharmacy_service.dtos.pagination.PageResponse;
+import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionCheckDto;
 import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionListDto;
 import com.sophia.sophia_pharmacy_service.dtos.response.ApiResponseDto;
 import com.sophia.sophia_pharmacy_service.entities.enums.Role;
@@ -8,6 +9,7 @@ import com.sophia.sophia_pharmacy_service.services.PermissionService;
 import com.sophia.sophia_pharmacy_service.validation.CheckPharmacyPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -42,5 +44,18 @@ public class PermissionController {
         return ResponseEntity.ok(response);
     }
 
+
+    @GetMapping("/check")
+    @CheckPharmacyPermission(role = {Role.EMPLOYEE, Role.OWNER})
+    public ResponseEntity<ApiResponseDto<PermissionCheckDto>> checkPermission(@PathVariable Long id,
+                                                                              @AuthenticationPrincipal String email){
+
+        PermissionCheckDto permission = permissionService.check(id, email);
+
+        ApiResponseDto<PermissionCheckDto> response = new ApiResponseDto<>("success",
+                permission, "Permissão verificada");
+
+        return ResponseEntity.ok(response);
+    }
 
 }

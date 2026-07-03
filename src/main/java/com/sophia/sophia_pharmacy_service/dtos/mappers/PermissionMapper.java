@@ -1,5 +1,6 @@
 package com.sophia.sophia_pharmacy_service.dtos.mappers;
 
+import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionCheckDto;
 import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionListDto;
 import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionUserDto;
 import com.sophia.sophia_pharmacy_service.entities.Permission;
@@ -22,4 +23,8 @@ public interface PermissionMapper {
     PermissionListDto ToDto(Permission permission);
 
     List<PermissionListDto> ToDtoList(List<Permission> permissionList);
+
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "pharmacyId", source = "pharmacy.id")
+    PermissionCheckDto toCheckDto(Permission permission);
 }
