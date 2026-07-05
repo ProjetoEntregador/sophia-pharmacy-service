@@ -21,11 +21,17 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.queue.outgoing}")
     private String outgoingQueue;
 
+    @Value("${rabbitmq.queue.audit}")
+    private String auditQueue;
+
     @Value("${rabbitmq.routing.incoming}")
     private String incomingRouting;
 
     @Value("${rabbitmq.routing.outgoing}")
     private String outgoingRouting;
+
+    @Value("${rabbitmq.routing.audit}")
+    private String auditRouting;
 
     @Bean
     public TopicExchange pharmacyExchange() {
@@ -43,6 +49,11 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue auditQueue() {
+        return QueueBuilder.durable(auditQueue).build();
+    }
+
+    @Bean
     public Binding incomingBinding() {
         return BindingBuilder
                 .bind(incomingQueue())
@@ -56,6 +67,14 @@ public class RabbitMQConfig {
                 .bind(outgoingQueue())
                 .to(pharmacyExchange())
                 .with(outgoingRouting);
+    }
+
+    @Bean
+    public Binding auditBinding() {
+        return BindingBuilder
+                .bind(auditQueue())
+                .to(pharmacyExchange())
+                .with(auditRouting);
     }
 
     @Bean

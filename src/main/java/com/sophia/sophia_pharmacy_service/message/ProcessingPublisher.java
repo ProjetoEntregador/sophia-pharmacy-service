@@ -19,10 +19,20 @@ public class ProcessingPublisher {
   @Value("${rabbitmq.routing.outgoing}")
   private String responseRouting;
 
+  @Value("${rabbitmq.routing.audit}")
+  private String auditRouting;
+
   public void publishResponse(ProcessingResponse response) {
 
     rabbitTemplate.convertAndSend(exchange, responseRouting, response);
 
     log.info("Response Published");
+  }
+
+  public void publishAudit(String response) {
+
+    rabbitTemplate.convertAndSend(exchange, auditRouting, response);
+
+    log.info("Audit Published");
   }
 }
