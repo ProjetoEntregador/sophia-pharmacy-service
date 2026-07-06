@@ -5,6 +5,7 @@ import com.sophia.sophia_pharmacy_service.auth.JwtUtil;
 import com.sophia.sophia_pharmacy_service.dtos.audit.AuditEventDto;
 import com.sophia.sophia_pharmacy_service.message.ProcessingPublisher;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -12,10 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 @Aspect
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AuditAspect {
 
     private final JwtUtil jwtUtil;
@@ -32,7 +35,9 @@ public class AuditAspect {
 
                 event.setService("pharmacy");
                 event.setChangedBy(jwtUtil.getAuthenticatedUserId().orElse(null));
-                event.setOccurredAt(Instant.now());
+                event.setOccurredAt(DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
+
+                log.info("Evento enviado: {}", event);
 
                 eventPublisher.publishAudit(event);
             }
