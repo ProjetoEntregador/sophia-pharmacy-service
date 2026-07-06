@@ -91,8 +91,8 @@ services:
     environment:
       POSTGRES_HOST: pharmacy-postgres
       POSTGRES_PORT: 5432
-      POSTGRES_USER: sophia-admin
-      POSTGRES_PASSWORD: gvjvlntm
+      POSTGRES_USER: ${DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
       POSTGRES_DB: pharmacy_db
       BACKUP_RETENTION_DAYS: 7
     volumes:
@@ -119,8 +119,8 @@ services:
     environment:
       POSTGRES_HOST: pharmacy-postgres
       POSTGRES_PORT: 5432
-      POSTGRES_USER: sophia-admin
-      POSTGRES_PASSWORD: gvjvlntm
+      POSTGRES_USER: ${DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
       POSTGRES_DB: pharmacy_db
       LOG_RETENTION_DAYS: 7
     volumes:
