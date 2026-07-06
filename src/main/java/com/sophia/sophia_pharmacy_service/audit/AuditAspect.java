@@ -31,7 +31,7 @@ public class AuditAspect {
             for (AuditEventDto event : auditContext.getEvents()) {
 
                 event.setService("pharmacy");
-                event.setChangedBy(jwtUtil.getAuthenticatedUserId());
+                event.setChangedBy(jwtUtil.getAuthenticatedUserId().orElse(null));
                 event.setOccurredAt(Instant.now());
 
                 eventPublisher.publishAudit(event);

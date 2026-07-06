@@ -1,5 +1,6 @@
 package com.sophia.sophia_pharmacy_service.dtos.mappers;
 
+import com.sophia.sophia_pharmacy_service.dtos.audit.PharmacyAuditDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyDetailDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyEntryDto;
 import com.sophia.sophia_pharmacy_service.dtos.pharmacy.PharmacyListDto;
@@ -20,4 +21,5 @@ public interface PharmacyMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromDto(PharmacyEntryDto dto, @MappingTarget Pharmacy pharmacy);
 
+    PharmacyAuditDto toAudit(Pharmacy pharmacy);
 }

@@ -8,10 +8,4 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface AuditEvent {
-
-    String entity();
-
-    AuditOperation operation();
-
-    String idParam() default "id";
 }

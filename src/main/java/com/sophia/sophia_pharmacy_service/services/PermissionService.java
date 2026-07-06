@@ -1,5 +1,8 @@
 package com.sophia.sophia_pharmacy_service.services;
 
+import com.sophia.sophia_pharmacy_service.audit.AuditContext;
+import com.sophia.sophia_pharmacy_service.audit.AuditEvent;
+import com.sophia.sophia_pharmacy_service.dtos.audit.PermissionAuditDto;
 import com.sophia.sophia_pharmacy_service.dtos.mappers.PermissionMapper;
 import com.sophia.sophia_pharmacy_service.dtos.pagination.PageResponse;
 import com.sophia.sophia_pharmacy_service.dtos.permission.PermissionCheckDto;
@@ -25,6 +28,9 @@ public class PermissionService {
     @Autowired
     private PermissionMapper permissionMapper;
 
+    @Autowired
+    private AuditContext auditContext;
+
     @Transactional
     public PageResponse<PermissionListDto> find(Long id, Integer offset, Integer size){
         if (size <= 0 || offset < 0) {
@@ -37,7 +43,7 @@ public class PermissionService {
 
         Page<Permission> permissionPage = permissionRepository.findAllByPharmacyId(id, pageable);
 
-        List<PermissionListDto> content = permissionMapper.ToDtoList(permissionPage.getContent());
+        List<PermissionListDto> content = permissionMapper.toDtoList(permissionPage.getContent());
 
         return new PageResponse<>(
                 content,
@@ -49,11 +55,16 @@ public class PermissionService {
     }
 
     @Transactional
+    @AuditEvent
     public void delete(Long id){
         Permission permission = permissionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Permissão não encontrada"));
 
         if (permission.getRole() == Role.OWNER){throw new RuntimeException("Não é possível remover o proprietário");}
+
+        PermissionAuditDto oldPermission = permissionMapper.toAudit(permission);
+
+        auditContext.delete("permission", oldPermission);
 
         permissionRepository.delete(permission);
 

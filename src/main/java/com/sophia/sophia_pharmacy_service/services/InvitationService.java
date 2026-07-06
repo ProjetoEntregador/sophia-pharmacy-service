@@ -1,7 +1,12 @@
 package com.sophia.sophia_pharmacy_service.services;
 
+import com.sophia.sophia_pharmacy_service.audit.AuditContext;
+import com.sophia.sophia_pharmacy_service.audit.AuditEvent;
+import com.sophia.sophia_pharmacy_service.dtos.audit.InvitationAuditDto;
+import com.sophia.sophia_pharmacy_service.dtos.audit.PermissionAuditDto;
 import com.sophia.sophia_pharmacy_service.dtos.invitation.InviteListDto;
 import com.sophia.sophia_pharmacy_service.dtos.mappers.InvitationMapper;
+import com.sophia.sophia_pharmacy_service.dtos.mappers.PermissionMapper;
 import com.sophia.sophia_pharmacy_service.dtos.pagination.PageResponse;
 import com.sophia.sophia_pharmacy_service.emailSender.EmailSender;
 import com.sophia.sophia_pharmacy_service.entities.Invitation;
@@ -45,7 +50,14 @@ public class InvitationService {
     @Autowired
     private InvitationMapper invitationMapper;
 
+    @Autowired
+    private AuditContext auditContext;
+
+    @Autowired
+    private PermissionMapper permissionMapper;
+
     @Transactional
+    @AuditEvent
     public InviteListDto invite(Long pharmacyId, String email, String ownerEmail) {
 
         User owner = userRepository.findByEmail(ownerEmail).orElseThrow();
@@ -69,20 +81,28 @@ public class InvitationService {
         Invitation invite = new Invitation(email, token, InvitationStatus.PENDING,
                                             LocalDateTime.now().plusDays(3), pharmacy, owner);
 
+        InvitationAuditDto inviteAudit = invitationMapper.toAudit(invite);
+
+        auditContext.insert("invitation", inviteAudit);
+
         String link = "LINK DO FRONT + token:" + token;
 
         emailService.sendInviteEmail(email, link, pharmacy.getName());
+
         return invitationMapper.toDto(inviteRepository.save(invite));
     }
 
 
     @Transactional
+    @AuditEvent
     public void acceptInvite(String token, String email) {
 
         User user = userRepository.findByEmail(email).orElseThrow();
 
         Invitation invitation = inviteRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Convite inválido"));
+
+        InvitationAuditDto oldInvite = invitationMapper.toAudit(invitation);
 
         if (invitation.getStatus() != InvitationStatus.PENDING) {
             throw new RuntimeException("Convite já utilizado");
@@ -98,11 +118,17 @@ public class InvitationService {
 
         Permission permission = new Permission(user, invitation.getPharmacy(), Role.EMPLOYEE);
 
+        PermissionAuditDto newPermission = permissionMapper.toAudit(permission);
+
+        auditContext.insert("permission", newPermission);
+
         permissionRepository.save(permission);
 
         invitation.setStatus(InvitationStatus.ACCEPTED);
 
-        inviteRepository.save(invitation);
+        InvitationAuditDto newInvite = invitationMapper.toAudit(inviteRepository.save(invitation));
+
+        auditContext.update("permission", oldInvite, newInvite);
     }
 
     public PageResponse<InviteListDto> list(Long pharmacyId, Integer offset, Integer size) {
@@ -129,6 +155,7 @@ public class InvitationService {
     }
 
     @Transactional
+    @AuditEvent
     public void cancel(Long id){
         Invitation invite = inviteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Convite não encontrad0"));
@@ -139,8 +166,16 @@ public class InvitationService {
                     invite.getPharmacy().getId()
             ).orElseThrow(() -> new RuntimeException("Permissão não encontrada"));
 
+            PermissionAuditDto oldPermission = permissionMapper.toAudit(permission);
+
+            auditContext.delete("permission", oldPermission);
+
             permissionRepository.delete(permission);
         }
+
+        InvitationAuditDto inviteAudit = invitationMapper.toAudit(inviteRepository.save(invite));
+
+        auditContext.delete("permission", inviteAudit);
 
         inviteRepository.delete(invite);
     }

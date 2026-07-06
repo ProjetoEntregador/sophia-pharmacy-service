@@ -2,6 +2,7 @@ package com.sophia.sophia_pharmacy_service.auth;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Optional;
 
 import com.sophia.sophia_pharmacy_service.entities.User;
 import com.sophia.sophia_pharmacy_service.repositories.UserRepository;
@@ -9,6 +10,7 @@ import io.jsonwebtoken.io.Decoders;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -69,14 +71,16 @@ public class JwtUtil {
         return expiration.before(new Date());
     }
 
-    public Long getAuthenticatedUserId(){
+    public Optional<Long> getAuthenticatedUserId() {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        String email = authentication.getName();
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
 
-        User user = userRepository.findByEmail(email).orElse(null);
+            return Optional.empty();
+        }
 
-        assert user != null;
-        return user.getId();
+        return userRepository.findByEmail(authentication.getName()).map(User::getId);
     }
 }

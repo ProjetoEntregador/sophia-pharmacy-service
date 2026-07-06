@@ -51,7 +51,7 @@ public class AuditContext {
         add(
                 AuditEventDto.builder()
                         .entity(entity)
-                        .operation(AuditOperation.INSERT)
+                        .operation(AuditOperation.UPDATE)
                         .oldData(oldData)
                         .newData(newData)
                         .build()
