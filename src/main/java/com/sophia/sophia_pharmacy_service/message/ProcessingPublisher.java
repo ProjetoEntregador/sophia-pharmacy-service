@@ -1,5 +1,6 @@
 package com.sophia.sophia_pharmacy_service.message;
 
+import com.sophia.sophia_pharmacy_service.dtos.audit.AuditEventDto;
 import com.sophia.sophia_pharmacy_service.dtos.message.ProcessingResponse;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ public class ProcessingPublisher {
     log.info("Response Published");
   }
 
-  public void publishAudit(String response) {
+  public void publishAudit(AuditEventDto response) {
 
     rabbitTemplate.convertAndSend(exchange, auditRouting, response);
 

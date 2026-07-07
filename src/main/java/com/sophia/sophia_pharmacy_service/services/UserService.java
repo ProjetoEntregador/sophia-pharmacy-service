@@ -1,7 +1,10 @@
 package com.sophia.sophia_pharmacy_service.services;
 
+import com.sophia.sophia_pharmacy_service.audit.AuditContext;
+import com.sophia.sophia_pharmacy_service.audit.AuditEvent;
 import com.sophia.sophia_pharmacy_service.auth.GoogleAuth;
 import com.sophia.sophia_pharmacy_service.auth.JwtUtil;
+import com.sophia.sophia_pharmacy_service.dtos.audit.UserAuditDto;
 import com.sophia.sophia_pharmacy_service.dtos.auth.LoginDto;
 import com.sophia.sophia_pharmacy_service.dtos.auth.UserDto;
 import com.sophia.sophia_pharmacy_service.dtos.auth.UserInfoDto;
@@ -39,7 +42,11 @@ public class UserService {
     @Autowired
     private PermissionMapper permissionMapper;
 
+    @Autowired
+    private AuditContext auditContext;
+
     @Transactional
+    @AuditEvent
     public void register(UserDto dto) {
 
         userRepository.findByEmail(dto.getEmail()).ifPresent(u -> {
@@ -48,7 +55,9 @@ public class UserService {
 
         dto.setProvider(Provider.LOCAL);
 
-        userRepository.save(userMapper.toEntity(dto));
+        UserAuditDto user = userMapper.toAudit(userRepository.save(userMapper.toEntity(dto)));
+
+        auditContext.insert("user", user);
     }
 
     public String login(LoginDto dto) {
@@ -62,7 +71,7 @@ public class UserService {
         return JwtUtil.generateToken(user);
     }
 
-
+    @AuditEvent
     public String loginWithGoogle(String idToken) {
         var payload = googleAuth.validate(idToken);
 
@@ -75,6 +84,11 @@ public class UserService {
                 newUser.setEmail(email);
                 newUser.setUsername(nome);
                 newUser.setProvider(Provider.GOOGLE);
+
+                UserAuditDto userAudit = userMapper.toAudit(newUser);
+
+                auditContext.insert("user", userAudit);
+
                 return userRepository.save(newUser);
             });
 
