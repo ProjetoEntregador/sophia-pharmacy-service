@@ -18,6 +18,6 @@ public class AuditEventDto {
     private Object oldData;
     private Object newData;
     private AuditOperation operation;
-    private Long changedBy;
+    private String changedBy;
     private String occurredAt;
 }
