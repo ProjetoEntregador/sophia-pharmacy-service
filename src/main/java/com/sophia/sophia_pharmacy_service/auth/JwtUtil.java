@@ -83,4 +83,17 @@ public class JwtUtil {
 
         return userRepository.findByEmail(authentication.getName()).map(User::getId);
     }
+
+    public Optional<String> getAuthenticatedUserEmail() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+
+            return Optional.empty();
+        }
+
+        return userRepository.findByEmail(authentication.getName()).map(User::getEmail);
+    }
 }

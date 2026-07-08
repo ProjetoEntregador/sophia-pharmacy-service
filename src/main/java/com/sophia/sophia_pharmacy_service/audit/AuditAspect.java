@@ -34,7 +34,7 @@ public class AuditAspect {
             for (AuditEventDto event : auditContext.getEvents()) {
 
                 event.setService("pharmacy");
-                event.setChangedBy(jwtUtil.getAuthenticatedUserId().orElse(null));
+                event.setChangedBy(jwtUtil.getAuthenticatedUserEmail().orElse(null));
                 event.setOccurredAt(DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
 
                 log.info("Evento enviado: {}", event);
