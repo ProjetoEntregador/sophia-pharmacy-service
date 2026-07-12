@@ -54,11 +54,27 @@ cd sophia-pharmacy-service
 
 ---
 
+### Dependências do ecossistema
+
+Para executar o serviço integrado ao restante do sistema, é necessário ter:
+
+- RabbitMQ disponível na rede compartilhada;
+  - https://github.com/ProjetoEntregador/sophia-message-broker.git
+- rede Docker externa net1, utilizada para comunicação entre os microsserviços.
+  ```bash
+  docker network create net1
+  ```
+No ambiente Docker do sistema completo, os nomes esperados são:
+
+- RabbitMQ: rabbitmq:5672;
+- PostgreSQL deste serviço: pharmacy-postgres:5432.
+
+___
 ### Configurar variáveis `.env`
 
 Renomeie o arquivo `.env.example` para `.env`.
 
-Configure as variáveis necessárias, como:
+Configure as variáveis necessárias para:
 
 - Banco de dados
 - JWT
