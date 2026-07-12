@@ -85,9 +85,7 @@ public class InvitationService {
 
         auditContext.insert("invitation", inviteAudit);
 
-        String link = "LINK DO FRONT + token:" + token;
-
-        emailService.sendInviteEmail(email, link, pharmacy.getName());
+        emailService.sendInviteEmail(email, token, pharmacy.getName());
 
         return invitationMapper.toDto(inviteRepository.save(invite));
     }
