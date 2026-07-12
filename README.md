@@ -1,124 +1,88 @@
-# Sophia Pharmacy Service
+# Serviço de Farmácia
 
-Backend de serviço de farmácia construído com Spring Boot, Java 21 e Maven. Oferece persistência de dados, autenticação, auditoria, envio de e-mail e monitoramento com PostgreSQL, Flyway e exportador de métricas PostgreSQL compatível com Prometheus.
+O **Serviço de Farmácia** é responsável pelo gerenciamento das farmácias, usuários e permissões de acesso do sistema SophIA. Além disso, realiza autenticação de usuários (credenciais e Google OAuth), gerenciamento de convites para funcionários, comunicação com o serviço de medicamentos e publicação de eventos de auditoria para rastreabilidade das operações realizadas.
 
-## Visão Geral do Projeto
+---
 
-- Spring Boot 3.5.6
+## 🛠️ Funcionalidades
+
+- Cadastro, consulta, atualização e remoção de farmácias
+- Gerenciamento de usuários e funcionários
+- Controle de permissões por farmácia (Owner e Employee)
+- Login utilizando e-mail e senha
+- Login com Google OAuth 2.0
+- Envio e gerenciamento de convites para novos funcionários
+- Consulta de farmácias próximas por geolocalização
+- Integração com o Serviço de Medicamentos
+- Publicação de eventos de auditoria no RabbitMQ
+- Envio de e-mails para convites de usuários
+
+---
+
+## 💻 Tecnologias
+
 - Java 21
-- Build com Maven
-- PostgreSQL para armazenamento de dados em produção
-- H2 disponível para execução/testes locais
-- Migrações de banco de dados com Flyway
-- Autenticação baseada em JWT e suporte a Google OAuth
-- Envio de e-mail via Spring Boot Mail
-- Suporte a exportador, backup, manutenção e envio de logs com Docker Compose
-
-## Pré-requisitos
-
-- JDK Java 21
-- Maven ou o wrapper Maven incluído (`./mvnw` / `mvnw.cmd`)
+- Spring Boot
+- Spring Security
+- Spring Data JPA
+- PostgreSQL
+- RabbitMQ
+- Flyway
 - Docker
 - Docker Compose
-- Rede Docker externa chamada `net1` ou ajuste `docker-compose.yml`
+- Google OAuth
+- JWT
 
-## Variáveis de Ambiente
+---
 
-O projeto depende de variáveis de ambiente definidas em um arquivo `.env`. Exemplos:
+## 🚀 Instalação
 
-- `DATASOURCE_URL`
-- `DATASOURCE_USERNAME`
-- `DATASOURCE_PASSWORD`
-- `JWT_SECRET`
-- `GOOGLE_CLIENT_ID`
-- `MAIL_SENDER_USERNAME`
-- `MAIL_APP_PASSWORD`
-- `MEDICATION_URL`
-- `CORS_ALLOWED_ORIGINS`
+### Pré-requisitos
 
-> Observação: `docker-compose.yml` já injeta essas variáveis nos containers.
+- Git
+- Docker
+- Docker Compose
 
-## Build
+---
 
-A partir da raiz do projeto:
+### Clonar
 
 ```bash
-./mvnw clean package -DskipTests
+git clone https://github.com/ProjetoEntregador/sophia-pharmacy-service.git
+cd sophia-pharmacy-service
 ```
 
-Ou com Maven instalado:
+---
+
+### Configurar variáveis `.env`
+
+Renomeie o arquivo `.env.example` para `.env`.
+
+Configure as variáveis necessárias, como:
+
+- Banco de dados
+- JWT
+- Google OAuth
+- Serviço de e-mail
+- Serviço de medicamentos
+- CORS
+
+---
+
+### Inicializando
 
 ```bash
-mvn clean package -DskipTests
+docker-compose up -d
 ```
 
-## Executar Localmente
+---
 
-### Opção 1: Executar com Maven
+### Acessando a aplicação
 
-```bash
-./mvnw spring-boot:run
+API:
+
+```
+http://localhost:8080
 ```
 
-### Opção 2: Executar o JAR empacotado
-
-```bash
-java -jar target/sophia-pharmacy-service-0.0.1-SNAPSHOT.jar
-```
-
-## Docker Compose
-
-Inicie a stack completa:
-
-```bash
-docker compose up --build
-```
-
-Esta composição inicia:
-
-- `pharmacy-postgres`: banco de dados PostgreSQL
-- `pharmacy-service`: aplicação Spring Boot
-- `pharmacy-postgres-exporter`: exportador Prometheus para PostgreSQL
-- `pharmacy-backup-service`: backups periódicos via scripts montados
-- `pharmacy-maintenance-service`: tarefas de manutenção periódicas
-- `pharmacy-promtail`: envio de logs do PostgreSQL
-
-### Observações
-
-- O arquivo Compose espera uma rede Docker externa chamada `net1`.
-- Os dados do PostgreSQL são persistidos em `pharmacy_postgres_data`.
-- Scripts de inicialização são carregados de `./db/init`.
-
-## Migrações de Banco de Dados
-
-As migrações do Flyway estão definidas em `src/main/resources/db/migration/V1__create_tables.sql`.
-
-## Testes
-
-Execute os testes de unidade com:
-
-```bash
-./mvnw test
-```
-
-## Comandos Úteis
-
-```bash
-./mvnw clean
-./mvnw test
-./mvnw spring-boot:run
-```
-
-## Estrutura do Projeto
-
-- `src/main/java`: código-fonte da aplicação
-- `src/main/resources`: configurações do Spring Boot
-- `db/init`: scripts de inicialização do PostgreSQL
-- `postgres-exporter`: configuração de consultas do exportador
-- `promtail`: configuração do Promtail
-- `scripts`: scripts de backup e manutenção
-
-## Observações
-
-- Se não houver arquivo `.env`, crie-o a partir das configurações do seu ambiente antes de iniciar o Docker Compose.
-- Ajuste `docker-compose.yml` caso sua rede Docker ou caminho de logs seja diferente.
+---
