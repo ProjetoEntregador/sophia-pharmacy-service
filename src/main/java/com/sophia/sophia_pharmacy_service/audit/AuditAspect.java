@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -37,9 +36,11 @@ public class AuditAspect {
                 event.setChangedBy(jwtUtil.getAuthenticatedUserEmail().orElse(null));
                 event.setOccurredAt(DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
 
-                log.info("Evento enviado: {}", event);
-
-                eventPublisher.publishAudit(event);
+                try {
+                    eventPublisher.publishAudit(event);
+                } catch (Exception ex) {
+                    log.error("Não foi possível publicar evento de auditoria.", ex);
+                }
             }
 
             return result;
