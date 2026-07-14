@@ -1,0 +1,41 @@
+package com.sophia.sophia_pharmacy_service.entities;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import com.sophia.sophia_pharmacy_service.entities.enums.Provider;
+
+@Entity
+@Table(name="tb_users")
+@Data
+@NoArgsConstructor
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "O nome não pode ser vazio")
+    private String username;
+
+    @NotBlank
+    @Email(message = "E-mail inválido")
+    private String email;
+
+    @Size(min = 8, message = "A senha deve ter no mínimo 8 caracteres")
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
+
+    public User(String username,String password, String email, Provider provider) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.provider = provider;
+    }
+}
